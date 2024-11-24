@@ -1,27 +1,12 @@
-import React from "react";
+import JoinForm from "@/components/Join/JoinForm";
 
-const page = () => {
+const Page = () => {
   return (
     <div className="center flex-col gap-5">
       <h1 className="title">이메일로 회원가입하기</h1>
-      <form className="flex flex-col gap-3">
-        <div className="flex gap-3">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="이메일을 입력하세요"
-            required
-          />
-        </div>
-
-        <button className="btn" type="submit">
-          회원가입
-        </button>
-      </form>
+      <JoinForm />
     </div>
   );
 };
 
-export default page;
+export default Page;
