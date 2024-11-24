@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { GoogleAuthProvider, getAuth } from "firebase/auth";
 
 // Firebase 설정 객체
 const firebaseConfig = {
@@ -19,5 +19,6 @@ const app = initializeApp(firebaseConfig);
 // Firestore와 Auth 객체를 초기화
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
 
 export default app;

@@ -6,11 +6,6 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { FormData } from "@/constants/constants";
-// interface SignUpFormData {
-//   email: string;
-//   password: string;
-//   confirmPassword: string;
-// }
 
 const JoinForm = () => {
   const router = useRouter();
@@ -22,14 +17,18 @@ const JoinForm = () => {
   } = useForm<FormData>();
 
   const handleSignUp = async (data: FormData) => {
-    const { email, password } = data;
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    if (userCredential.user) {
-      router.push("/");
+    try {
+      const { email, password } = data;
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredential.user) {
+        router.push("/");
+      }
+    } catch (err) {
+      console.log("err", err);
     }
   };
 

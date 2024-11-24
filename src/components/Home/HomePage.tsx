@@ -3,6 +3,7 @@ import Link from "next/link";
 import useIsLogin from "@/hooks/useIsLogin";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import SignInWithGoogle from "../Login/SignInWithGoogle";
 
 const HomePage = () => {
   const { isLogin, email } = useIsLogin();
@@ -23,6 +24,7 @@ const HomePage = () => {
           <Link href="/login" className="btn">
             로그인
           </Link>
+          <SignInWithGoogle />
         </div>
       )}
     </>

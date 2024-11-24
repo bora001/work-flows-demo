@@ -35,6 +35,11 @@ const LoginForm = () => {
       }
     }
   };
+
+  // const loginByGoogle = () => {
+  //   console.log("ggggoo");
+  // };
+
   return (
     <form className="flex flex-col gap-3" onSubmit={(e) => e.preventDefault()}>
       <FormHelper
@@ -68,12 +73,6 @@ const LoginForm = () => {
         onClick={handleSubmit(loginByEmail)}
       >
         이메일로 로그인
-      </button>
-      <button
-        className="btn-white flex gap-3 justify-center"
-        disabled={isSubmitting}
-      >
-        구글 로그인
       </button>
     </form>
   );

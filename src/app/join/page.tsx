@@ -1,18 +1,10 @@
-import Link from "next/link";
-import React from "react";
+import JoinForm from "@/components/Join/JoinForm";
 
 const page = () => {
   return (
     <div className="center flex-col gap-3">
-      <h1 className="title">회원가입</h1>
-      <div className="flex gap-3">
-        <Link href="/join/google" className="btn">
-          구글로 가입하기
-        </Link>
-        <Link href="/join/email" className="btn">
-          이메일로 가입하기
-        </Link>
-      </div>
+      <h1 className="title">이메일로 회원가입하기</h1>
+      <JoinForm />
     </div>
   );
 };
