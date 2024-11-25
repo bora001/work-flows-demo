@@ -29,15 +29,17 @@ const Workflow = () => {
 
   const { getViewport } = useReactFlow();
 
-  const [showMenu, setShowMenu] = useState(false);
+  const [currentNode, setCurrentNode] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-
+  const [currentMenu, setCurrentMenu] = useState("");
   const clickNode = (
     e: MouseEvent<Element, globalThis.MouseEvent>,
     node: Node
   ) => {
     e.stopPropagation();
-    setShowMenu((prev) => !prev);
+    setCurrentNode(currentNode ? null : node.id);
+    console.log("node,", node);
+    setCurrentMenu(String(node.data.type));
     const { x, y, zoom } = getViewport();
     const adjustedX = node.position.x * zoom + x;
     const adjustedY = node.position.y * zoom + y;
@@ -45,23 +47,22 @@ const Workflow = () => {
   };
 
   const clickBackground = () => {
-    setShowMenu(false);
+    setCurrentNode(null);
     console.log("back");
   };
 
   const onNodeDrag = () => {
-    setShowMenu(false);
+    setCurrentNode(null);
   };
 
-  const addNode = () => {
-    setShowMenu(false);
+  const addNode = ({ label, type }: { label: string; type: string }) => {
+    setCurrentNode(null);
     const newNodeId = `${nodes.length + 1}`;
     const lastNode = nodes[nodes.length - 1];
-
     const newNode = {
       id: newNodeId,
       type: "default",
-      data: { label: `노드 ${newNodeId}` },
+      data: { label: `${label}`, type },
       position: { x: lastNode.position.x + 200, y: lastNode.position.y }, // x축으로 150px 간격
     };
 
@@ -77,20 +78,49 @@ const Workflow = () => {
     setEdges((prevEdges) => [...prevEdges, newEdge]);
   };
 
+  const addRows = () => {
+    const newNodeId =
+      nodes.filter((node) => node.data.label.includes("ADD ROWS")).length + 1;
+    addNode({ label: `ADD ROWS ${newNodeId}`, type: "add_rows" });
+  };
+
+  const deleteNode = () => {
+    const nodeId = currentNode;
+    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== nodeId));
+    setEdges((prevEdges) =>
+      prevEdges.filter(
+        (edge) => edge.source !== nodeId && edge.target !== nodeId
+      )
+    );
+    setCurrentNode(null);
+  };
+
   return (
     <div style={{ width: "100%", height: "100vh" }} onClick={clickBackground}>
-      {showMenu && (
+      {currentNode && (
         <div
-          className="drop-shadow-lg bg-blue-200 absolute z-10 p-5 rounded-lg"
+          className="drop-shadow-lg bg-blue-200 absolute z-10 p-5 rounded-lg
+          flex flex-col gap-3
+          "
           style={{
             top: menuPosition.y - 10,
             left: menuPosition.x - 100,
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <button className="btn" onClick={addNode}>
-            Add Rows
-          </button>
+          {currentMenu === "add_rows" && (
+            <button className="btn">SET DATA</button>
+          )}
+          {nodes.length > 0 && (
+            <button className="btn" onClick={deleteNode}>
+              DELETE
+            </button>
+          )}
+          {currentMenu !== "add_rows" && (
+            <button className="btn" onClick={addRows}>
+              ADD ROWS
+            </button>
+          )}
         </div>
       )}
       <ReactFlow
