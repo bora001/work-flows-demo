@@ -1,13 +1,9 @@
-import Workflow from "@/components/WorkFlow/Workflow";
-import React from "react";
-import { ReactFlowProvider } from "@xyflow/react";
+import WorkflowList from "@/components/WorkFlow/WorkflowList";
 const page = () => {
   return (
-    <ReactFlowProvider>
-      <div className="center">
-        <Workflow />
-      </div>
-    </ReactFlowProvider>
+    <div className="center">
+      <WorkflowList />
+    </div>
   );
 };
 
