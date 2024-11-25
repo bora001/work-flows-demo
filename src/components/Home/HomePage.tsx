@@ -12,6 +12,9 @@ const HomePage = () => {
       {isLogin ? (
         <div className="flex flex-col gap-4">
           <>Welcome {email}</>
+          <Link className="btn-white border text-center" href="workflows">
+            Workflows
+          </Link>
           <button className="btn" onClick={() => signOut(auth)}>
             로그아웃
           </button>
