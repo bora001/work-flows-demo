@@ -11,6 +11,44 @@ type WorkFlowListType = {
   id: string;
   createdAt?: Date;
 };
+
+export type NodeType = {
+  id: string;
+  type: string;
+  data: {
+    label: string;
+    type?: string;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
+};
+
+export type EdgeType = {
+  id: string;
+  source: string;
+  target: string;
+  animated: boolean;
+};
+const initialNodes: NodeType[] = [
+  {
+    id: "1",
+    type: "default",
+    data: { label: "START" },
+    position: { x: 100, y: 100 }, // 초기 위치
+  },
+];
+
+const initialEdges: EdgeType[] = [
+  {
+    id: "edge",
+    source: "1",
+    target: "2",
+    animated: true,
+  },
+];
+
 const WorkflowList = () => {
   const router = useRouter();
   const [listName, setListName] = useState("");
@@ -23,6 +61,8 @@ const WorkflowList = () => {
         name: listName,
         userId: auth.currentUser.uid, // 로그인된 유저의 uid를 리스트에 저장
         createdAt: new Date(),
+        Flow: initialNodes,
+        Edge: initialEdges,
       });
     } catch (err) {
       console.log("err", err);

@@ -3,29 +3,25 @@
 import { Node, ReactFlow, useReactFlow } from "@xyflow/react";
 import Select, { SingleValue } from "react-select";
 import axios from "axios";
-import { ChangeEvent, FormEvent, MouseEvent, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import "@xyflow/react/dist/style.css";
 import { PlayArrow } from "@mui/icons-material";
-const initialNodes = [
-  {
-    id: "1",
-    type: "default",
-    data: { label: "START" },
-    position: { x: 100, y: 100 }, // 초기 위치
-  },
-];
+import { useParams } from "next/navigation";
+import { db } from "@/lib/firebase";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { EdgeType, NodeType } from "./WorkflowList";
 
-const initialEdges = [
-  {
-    id: "edge",
-    source: "1",
-    target: "2",
-    animated: true,
-  },
-];
 const Workflow = () => {
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const { id } = useParams();
+  const [nodes, setNodes] = useState<NodeType[]>([]);
+  const [edges, setEdges] = useState<EdgeType[]>([]);
   const { getViewport } = useReactFlow();
 
   const [currentNode, setCurrentNode] = useState<string | null>(null);
@@ -37,7 +33,6 @@ const Workflow = () => {
   ) => {
     e.stopPropagation();
     setCurrentNode(currentNode ? null : node.id);
-    console.log("node,", node);
     setCurrentMenu(String(node.data.type));
     const { x, y, zoom } = getViewport();
     const adjustedX = node.position.x * zoom + x;
@@ -47,7 +42,6 @@ const Workflow = () => {
 
   const clickBackground = () => {
     setCurrentNode(null);
-    console.log("back");
   };
 
   const onNodeDrag = () => {
@@ -75,6 +69,9 @@ const Workflow = () => {
       animated: true,
     };
     setEdges((prevEdges) => [...prevEdges, newEdge]);
+
+    // firebase
+    updateList(newNode, newEdge);
   };
 
   const addRows = () => {
@@ -141,6 +138,49 @@ const Workflow = () => {
     }
   };
 
+  const updateList = useCallback(
+    async (node: NodeType, edge: EdgeType) => {
+      if (!id) return;
+      try {
+        const listRef = doc(db, "lists", String(id));
+        await updateDoc(listRef, {
+          Flow: arrayUnion(node),
+          Edge: arrayUnion(edge),
+        });
+        console.log("List updated successfully");
+      } catch (e) {
+        console.error("Error updating document: ", e);
+      }
+    },
+    [id]
+  );
+
+  const getList = useCallback(async () => {
+    if (!id) return;
+
+    try {
+      const listRef = doc(db, "lists", String(id));
+      const docSnap = await getDoc(listRef);
+      if (docSnap.exists()) {
+        const { Flow, Edge } = docSnap.data();
+        setNodes(Flow);
+        setEdges(Edge);
+        return;
+      } else {
+        console.log("No such document!");
+      }
+    } catch (e) {
+      console.error("Error getting document: ", e);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // get list from firebase
+    if (id) {
+      getList();
+    }
+  }, [getList, id]);
+
   return (
     <div style={{ width: "100%", height: "100vh" }} onClick={clickBackground}>
       {currentNode && (
@@ -176,12 +216,12 @@ const Workflow = () => {
               SET DATA
             </button>
           )}
-          {nodes.length > 0 && (
+          {+currentNode !== 1 && (
             <button className="btn !bg-[red]" onClick={deleteNode}>
               DELETE
             </button>
           )}
-          {nodes.length === 1 && (
+          {currentMenu !== "add_rows" && (
             <button className="btn" onClick={addRows}>
               ADD ROWS
             </button>
