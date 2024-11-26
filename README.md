@@ -22,7 +22,7 @@
       - 이메일
       - Google OAuth
     - 데이터베이스
-      - Workflow 리스트
+      - Workflow 리스트 추가/삭제
       - Workflow의 유저 데이터
   - Make
     - Webhooks을 사용하여 Google Sheet 연동

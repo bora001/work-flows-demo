@@ -229,7 +229,7 @@ const Workflow = () => {
               <input
                 className="h-9 px-2"
                 onChange={handleInputChange}
-                defaultValue={selectInfo.value}
+                defaultValue={selectInfo?.value}
               />
               <button className="btn" type="submit">
                 Set Data

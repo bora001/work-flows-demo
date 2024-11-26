@@ -127,7 +127,7 @@ const WorkflowList = () => {
         <LoadingSpinner style="text-blue-500" />
       ) : (
         <div>
-          <div className="flex flex-col mb-4 gap-3 text-center h-[350px] overflow-y-scroll px-4">
+          <div className="flex flex-col mb-4 gap-3 text-center maxH-[350px] overflow-y-scroll px-4">
             {lists.map((list) => (
               <div key={list.id} className="flex justify-between">
                 <Link href={`/workflows/${list.id}`}>{list.name}</Link>
