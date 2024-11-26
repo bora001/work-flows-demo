@@ -13,8 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import LoadingSpinner from "../LoadingSpinner";
 type WorkFlowListType = {
   name?: string;
@@ -61,16 +60,13 @@ const initialEdges: EdgeType[] = [
 ];
 
 const WorkflowList = () => {
-  const router = useRouter();
   const { uid, loading } = useIsLogin();
   const [listName, setListName] = useState("");
   const [lists, setLists] = useState<WorkFlowListType[]>([]);
   const { popToast } = usePopToast();
 
-  const addList = async () => {
-    if (!uid) {
-      return router.push("/");
-    }
+  const addList = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       await addDoc(collection(db, "lists"), {
         name: listName,
@@ -79,7 +75,11 @@ const WorkflowList = () => {
         Flow: initialNodes,
         Edge: initialEdges,
       });
+      popToast({ type: "success", title: "리스트를 추가했습니다!" });
+      getUserList();
+      setListName("");
     } catch (err) {
+      popToast({ type: "error", title: `에러 : ${err}` });
       console.log("err", err);
     }
   };
@@ -90,6 +90,7 @@ const WorkflowList = () => {
       await deleteDoc(listRef);
       popToast({ type: "success", title: "리스트를 삭제했습니다!" });
       console.log(`Document with ID: ${id} has been deleted.`);
+      getUserList();
     } catch (err) {
       popToast({ type: "error", title: `에러 : ${err}` });
       console.log("err", err);
@@ -97,11 +98,6 @@ const WorkflowList = () => {
   };
 
   const getUserLists = useCallback(async () => {
-    if (!uid) {
-      console.log("User is not logged in");
-      return;
-    }
-
     try {
       const q = query(collection(db, "lists"), where("userId", "==", uid));
       const querySnapshot = await getDocs(q);
@@ -115,11 +111,15 @@ const WorkflowList = () => {
     }
   }, [uid]);
 
-  useEffect(() => {
+  const getUserList = useCallback(() => {
     getUserLists().then((userLists) => {
       setLists(userLists ?? []);
     });
   }, [getUserLists]);
+
+  useEffect(() => {
+    getUserList();
+  }, [getUserList]);
 
   return (
     <div>
@@ -127,7 +127,7 @@ const WorkflowList = () => {
         <LoadingSpinner style="text-blue-500" />
       ) : (
         <div>
-          <div className="flex flex-col mb-4 gap-3 text-center">
+          <div className="flex flex-col mb-4 gap-3 text-center h-[350px] overflow-y-scroll px-4">
             {lists.map((list) => (
               <div key={list.id} className="flex justify-between">
                 <Link href={`/workflows/${list.id}`}>{list.name}</Link>
@@ -139,9 +139,10 @@ const WorkflowList = () => {
             ))}
           </div>
 
-          <form className="flex gap-3" onSubmit={addList}>
+          <form className="flex gap-3" onSubmit={(e) => addList(e)}>
             <input
               required
+              value={listName}
               maxLength={24}
               onChange={(e) => setListName(e.target.value)}
               placeholder="리스트 이름을 입력하세요"
