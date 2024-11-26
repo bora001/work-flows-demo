@@ -7,6 +7,7 @@ type LoginUserInfoType = {
   email: string | null;
 };
 const useIsLogin = () => {
+  const [loading, setLoading] = useState(true); // 로딩 상태 추가
   const [hasUser, setHasUser] = useState<LoginUserInfoType>({
     token: null,
     isLogin: false,
@@ -20,10 +21,11 @@ const useIsLogin = () => {
       } else {
         setHasUser({ token: null, isLogin: false, email: null });
       }
+      setLoading(false);
     });
   }, []);
 
-  return { ...hasUser };
+  return { ...hasUser, loading };
 };
 
 export default useIsLogin;

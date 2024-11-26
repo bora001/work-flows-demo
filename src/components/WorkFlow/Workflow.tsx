@@ -234,23 +234,23 @@ const Workflow = () => {
                 defaultValue={selectInfo.value}
               />
               <button className="btn" type="submit">
-                ADD DATA
+                Set Data
               </button>
             </form>
           )}
           {currentMenu === "add_rows" && (
             <button className="btn" onClick={setData}>
-              SET DATA
+              Set Data
             </button>
           )}
           {+currentNode !== 1 && (
             <button className="btn !bg-[red]" onClick={deleteNode}>
-              DELETE
+              Delete
             </button>
           )}
           {currentMenu !== "add_rows" && (
             <button className="btn" onClick={addRows}>
-              ADD ROWS
+              Add rows
             </button>
           )}
         </div>
