@@ -201,8 +201,8 @@ const Workflow = () => {
   }, [getList, id]);
 
   const currentSelect = useMemo(
-    () => options.filter((item) => item.label === selectInfo.option),
-    [options, selectInfo.option]
+    () => options.filter((item) => item.label === selectInfo?.option),
+    [options, selectInfo?.option]
   );
 
   const isProcessing = useMemo(() => status === "pending", [status]);
