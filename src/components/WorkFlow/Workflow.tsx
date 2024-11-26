@@ -2,7 +2,6 @@
 
 import { Node, ReactFlow, useReactFlow } from "@xyflow/react";
 import Select, { SingleValue } from "react-select";
-import "react-toastify/dist/ReactToastify.css";
 
 import {
   ChangeEvent,
@@ -19,7 +18,6 @@ import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { EdgeType, NodeType } from "./WorkflowList";
-import { ToastContainer } from "react-toastify";
 import usePopToast from "@/hooks/usePopToast";
 import usePostData from "@/hooks/usePostData";
 
@@ -209,7 +207,6 @@ const Workflow = () => {
 
   return (
     <div style={{ width: "100%", height: "100vh" }} onClick={clickBackground}>
-      <ToastContainer />
       {currentNode && (
         <div
           className="drop-shadow-lg bg-blue-200 absolute z-10 p-5 rounded-lg

@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Side from "@/components/@Side/Side";
 import Provider from "@/components/Provider";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,6 +34,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased flex`}
         >
           <Side />
+          <ToastContainer />
           <div className="w-screen">{children}</div>
         </body>
       </Provider>

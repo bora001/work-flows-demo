@@ -1,5 +1,7 @@
 import { ToastPosition, toast } from "react-toastify";
 
+//         popToast({ type: "success", title: "새로운 리스트를 추가했습니다 !" });
+
 const usePopToast = () => {
   const popToast = ({
     type,

@@ -1,7 +1,16 @@
 "use client";
+import usePopToast from "@/hooks/usePopToast";
 import { auth, db } from "@/lib/firebase";
-import { Add } from "@mui/icons-material";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { Add, DeleteOutline } from "@mui/icons-material";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -52,6 +61,9 @@ const initialEdges: EdgeType[] = [
 const WorkflowList = () => {
   const router = useRouter();
   const [listName, setListName] = useState("");
+  const [lists, setLists] = useState<WorkFlowListType[]>([]);
+  const { popToast } = usePopToast();
+
   const addList = async () => {
     if (!auth.currentUser) {
       return router.push("/");
@@ -65,6 +77,18 @@ const WorkflowList = () => {
         Edge: initialEdges,
       });
     } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  const deleteList = async (id: string) => {
+    try {
+      const listRef = doc(db, "lists", id);
+      await deleteDoc(listRef);
+      popToast({ type: "success", title: "리스트를 삭제했습니다!" });
+      console.log(`Document with ID: ${id} has been deleted.`);
+    } catch (err) {
+      popToast({ type: "error", title: `에러 : ${err}` });
       console.log("err", err);
     }
   };
@@ -90,8 +114,6 @@ const WorkflowList = () => {
     }
   };
 
-  const [lists, setLists] = useState<WorkFlowListType[]>([]);
-
   useEffect(() => {
     getUserLists().then((userLists) => {
       setLists(userLists ?? []);
@@ -102,15 +124,20 @@ const WorkflowList = () => {
     <div>
       <div className="flex flex-col mb-4 gap-3 text-center">
         {lists.map((list) => (
-          <Link key={list.id} href={`/workflows/${list.id}`}>
-            {list.name}
-          </Link>
+          <div key={list.id} className="flex justify-between">
+            <Link href={`/workflows/${list.id}`}>{list.name}</Link>
+            <DeleteOutline
+              className="hover:text-red-500 cursor-pointer"
+              onClick={() => deleteList(list.id)}
+            />
+          </div>
         ))}
       </div>
 
       <form className="flex gap-3" onSubmit={addList}>
         <input
           required
+          maxLength={24}
           onChange={(e) => setListName(e.target.value)}
           placeholder="리스트 이름을 입력하세요"
           className="border-b-2 border-b-blue-500 px-3"
