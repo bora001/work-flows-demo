@@ -13,13 +13,14 @@ import {
   useState,
 } from "react";
 import "@xyflow/react/dist/style.css";
-import { HourglassEmpty, PlayArrow } from "@mui/icons-material";
+import { PlayArrow } from "@mui/icons-material";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
 import { EdgeType, NodeType } from "./WorkflowList";
 import usePopToast from "@/hooks/usePopToast";
 import usePostData from "@/hooks/usePostData";
+import LoadingSpinner from "../LoadingSpinner";
 
 type SelectInfoType = {
   value: string;
@@ -269,7 +270,7 @@ const Workflow = () => {
         {isProcessing ? (
           <>
             <p>Processing..</p>
-            <HourglassEmpty className="animate-spin" />
+            <LoadingSpinner />
           </>
         ) : (
           <>

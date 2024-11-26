@@ -5,27 +5,34 @@ type LoginUserInfoType = {
   token: string | null;
   isLogin: boolean;
   email: string | null;
+  uid: string | null;
 };
 const useIsLogin = () => {
   const [loading, setLoading] = useState(true); // 로딩 상태 추가
-  const [hasUser, setHasUser] = useState<LoginUserInfoType>({
+  const [userInfo, setUserInfo] = useState<LoginUserInfoType>({
     token: null,
     isLogin: false,
     email: null,
+    uid: null,
   });
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await user.getIdToken(true);
-        setHasUser({ token, isLogin: !!token, email: user.email });
+        setUserInfo({
+          token,
+          isLogin: !!token,
+          email: user.email,
+          uid: user.uid,
+        });
       } else {
-        setHasUser({ token: null, isLogin: false, email: null });
+        setUserInfo({ token: null, isLogin: false, email: null, uid: null });
       }
       setLoading(false);
     });
   }, []);
 
-  return { ...hasUser, loading };
+  return { ...userInfo, loading };
 };
 
 export default useIsLogin;

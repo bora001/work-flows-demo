@@ -1,6 +1,7 @@
 "use client";
+import useIsLogin from "@/hooks/useIsLogin";
 import usePopToast from "@/hooks/usePopToast";
-import { auth, db } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { Add, DeleteOutline } from "@mui/icons-material";
 import {
   addDoc,
@@ -13,7 +14,8 @@ import {
 } from "firebase/firestore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import LoadingSpinner from "../LoadingSpinner";
 type WorkFlowListType = {
   name?: string;
   userId?: string;
@@ -60,18 +62,19 @@ const initialEdges: EdgeType[] = [
 
 const WorkflowList = () => {
   const router = useRouter();
+  const { uid, loading } = useIsLogin();
   const [listName, setListName] = useState("");
   const [lists, setLists] = useState<WorkFlowListType[]>([]);
   const { popToast } = usePopToast();
 
   const addList = async () => {
-    if (!auth.currentUser) {
+    if (!uid) {
       return router.push("/");
     }
     try {
       await addDoc(collection(db, "lists"), {
         name: listName,
-        userId: auth.currentUser.uid, // 로그인된 유저의 uid를 리스트에 저장
+        userId: uid, // 로그인된 유저의 uid를 리스트에 저장
         createdAt: new Date(),
         Flow: initialNodes,
         Edge: initialEdges,
@@ -93,16 +96,14 @@ const WorkflowList = () => {
     }
   };
 
-  const getUserLists = async () => {
-    const user = auth.currentUser;
-
-    if (!user) {
+  const getUserLists = useCallback(async () => {
+    if (!uid) {
       console.log("User is not logged in");
       return;
     }
 
     try {
-      const q = query(collection(db, "lists"), where("userId", "==", user.uid));
+      const q = query(collection(db, "lists"), where("userId", "==", uid));
       const querySnapshot = await getDocs(q);
       const userLists: WorkFlowListType[] = [];
       querySnapshot.forEach((doc) => {
@@ -112,41 +113,47 @@ const WorkflowList = () => {
     } catch (e) {
       console.error("Error getting documents: ", e);
     }
-  };
+  }, [uid]);
 
   useEffect(() => {
     getUserLists().then((userLists) => {
       setLists(userLists ?? []);
     });
-  }, []);
+  }, [getUserLists]);
 
   return (
     <div>
-      <div className="flex flex-col mb-4 gap-3 text-center">
-        {lists.map((list) => (
-          <div key={list.id} className="flex justify-between">
-            <Link href={`/workflows/${list.id}`}>{list.name}</Link>
-            <DeleteOutline
-              className="hover:text-red-500 cursor-pointer"
-              onClick={() => deleteList(list.id)}
-            />
+      {loading ? (
+        <LoadingSpinner style="text-blue-500" />
+      ) : (
+        <div>
+          <div className="flex flex-col mb-4 gap-3 text-center">
+            {lists.map((list) => (
+              <div key={list.id} className="flex justify-between">
+                <Link href={`/workflows/${list.id}`}>{list.name}</Link>
+                <DeleteOutline
+                  className="hover:text-red-500 cursor-pointer"
+                  onClick={() => deleteList(list.id)}
+                />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <form className="flex gap-3" onSubmit={addList}>
-        <input
-          required
-          maxLength={24}
-          onChange={(e) => setListName(e.target.value)}
-          placeholder="리스트 이름을 입력하세요"
-          className="border-b-2 border-b-blue-500 px-3"
-        />
-        <button className="flex btn gap-1" type="submit">
-          <Add />
-          <p>ADD LIST</p>
-        </button>
-      </form>
+          <form className="flex gap-3" onSubmit={addList}>
+            <input
+              required
+              maxLength={24}
+              onChange={(e) => setListName(e.target.value)}
+              placeholder="리스트 이름을 입력하세요"
+              className="border-b-2 border-b-blue-500 px-3"
+            />
+            <button className="flex btn gap-1" type="submit">
+              <Add />
+              <p>ADD LIST</p>
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

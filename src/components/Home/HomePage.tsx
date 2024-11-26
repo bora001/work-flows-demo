@@ -4,12 +4,12 @@ import useIsLogin from "@/hooks/useIsLogin";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import SignInWithGoogle from "../Login/SignInWithGoogle";
-import { HourglassEmpty } from "@mui/icons-material";
+import LoadingSpinner from "../LoadingSpinner";
 
 const HomePage = () => {
   const { isLogin, email, loading } = useIsLogin();
   if (loading) {
-    return <HourglassEmpty className="text-blue-500 animate-spin" />;
+    return <LoadingSpinner style="text-blue-500" />;
   }
   return (
     <>
